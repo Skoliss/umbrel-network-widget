@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  app_proxy:
+    environment:
+      APP_HOST: netmeter-traffic_web_1
+      APP_PORT: 8080
+  collector:
+    image: python:3.13-alpine@sha256:2d9aefe2fef018a7eb2c13064c89c71929800fd2e5dccdbf52ea5da5bb8d929a
+    # Host network namespace is required to read HOST /proc/net/dev.
+    # This process does not create network sockets or serve HTTP.
+    network_mode: host
+    user: "1000:1000"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    restart: on-failure
+    pids_limit: 32
+    mem_limit: 64m
+    environment:
+      NET_INTERFACE: auto
+      PYTHONDONTWRITEBYTECODE: "1"
+    command: [python, -u, /app/meter.py, collect]
+    volumes:
+      - ${APP_DATA_DIR}/src:/app:ro
+      - ${APP_DATA_DIR}/data/state:/state
+  web:
+    image: python:3.13-alpine@sha256:2d9aefe2fef018a7eb2c13064c89c71929800fd2e5dccdbf52ea5da5bb8d929a
+    user: "1000:1000"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    restart: on-failure
+    pids_limit: 32
+    mem_limit: 64m
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+    command: [python, -u, /app/meter.py, serve]
+    volumes:
+      - ${APP_DATA_DIR}/src:/app:ro
+      - ${APP_DATA_DIR}/data/state:/state:ro

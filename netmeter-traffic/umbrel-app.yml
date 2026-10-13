@@ -1,0 +1,42 @@
+manifestVersion: 2.0
+id: netmeter-traffic
+storage:
+  dataRoot: data
+environment:
+  - name: NET_INTERFACE
+    services: [collector]
+    default: auto
+    note: "auto selects the lowest-metric IPv4 default route. Set an exact interface name from the app page to measure Ethernet/Wi-Fi instead of a VPN."
+category: networking
+name: Network Traffic
+version: "0.1.0"
+tagline: Live host RX and TX on your desktop
+description: >-
+  Personal, unofficial network widget for umbrelOS 2.0. Displays Download (RX), Upload (TX), and the selected interface every two seconds in Mbps.
+
+
+  The collector shares the host network namespace to read interface counters. It opens no listening socket and runs without root or Linux capabilities. Traffic includes LAN and Internet traffic on one selected interface, not the whole router. Open the app to inspect the interface list. This package needs a first installation test on your Umbrel.
+developer: Personal local package
+website: https://github.com/getumbrel/umbrel-community-app-store
+repo: ""
+support: See the README supplied with this package
+dependencies: []
+port: 38921
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+releaseNotes: "Initial personal package; not an official Umbrel app."
+backupIgnore:
+  - data/state/*
+widgets:
+  - id: traffic
+    type: three-stats
+    refresh: 2s
+    endpoint: web:8080/widget
+    link: ""
+    example:
+      items:
+        - {subtext: "Download RX", text: "12.34 Mbps"}
+        - {subtext: "Upload TX", text: "1.23 Mbps"}
+        - {subtext: "Interface", text: "eth0"}
